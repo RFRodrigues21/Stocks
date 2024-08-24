@@ -52,7 +52,7 @@ You can add data manually using the backend endpoints, or if you prefer, we have
 
 ## API Endpoints
 
-Once the server is running, the API will be accessible at `http://localhost:3000`. You can interact with the API using your preferred API client or via frontend calls.
+Once the server is running, the API will be accessible at `http://localhost:3000/api`. You can interact with the API using your preferred API client or via frontend calls.
 
 ## API Documentation
 
