@@ -1,0 +1,302 @@
+openapi: 3.0.3
+info:
+  title: Full-stack exercise
+  version: 1.0.0
+  description: Full-stack exercise api doc
+servers:
+  - url: http://localhost:3000
+    description: Local server
+paths:
+  /securities:
+    get:
+      summary: Get all securities
+      description: Returns a list of all securities, optionally in a simplified form.
+      parameters:
+        - in: query
+          name: simple
+          schema:
+            type: boolean
+          required: false
+          description: If true, returns only ['id', 'ticker', 'securityName', 'sector', 'country', 'trend'] fields of securities.
+      responses:
+        "200":
+          description: A list of securities.
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        ticker:
+                          type: string
+                          example: "AAPL"
+                        securityName:
+                          type: string
+                          example: "Apple Inc."
+                        sector:
+                          type: string
+                          example: "Technology"
+                        country:
+                          type: string
+                          example: "USA"
+                        trend:
+                          type: number
+                          format: float
+                          example: 1.5
+                        prices:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Price"
+                  - type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        ticker:
+                          type: string
+                          example: "AAPL"
+                        securityName:
+                          type: string
+                          example: "Apple Inc."
+                        sector:
+                          type: string
+                          example: "Technology"
+                        country:
+                          type: string
+                          example: "USA"
+                        trend:
+                          type: number
+                          format: float
+                          example: 1.5
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+    post:
+      summary: Create a new security
+      requestBody:
+        description: Security object to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ticker:
+                  type: string
+                  example: "AAPL"
+                securityName:
+                  type: string
+                  example: "Apple Inc."
+                sector:
+                  type: string
+                  example: "Technology"
+                country:
+                  type: string
+                  example: "USA"
+                trend:
+                  type: number
+                  format: float
+                  example: 1.5
+      responses:
+        "201":
+          description: Security created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  ticker:
+                    type: string
+                    example: "AAPL"
+                  securityName:
+                    type: string
+                    example: "Apple Inc."
+                  sector:
+                    type: string
+                    example: "Technology"
+                  country:
+                    type: string
+                    example: "USA"
+                  trend:
+                    type: number
+                    format: float
+                    example: 1.5
+        "400":
+          description: Bad request, missing required fields
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "All fields are required"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+  /securities/{securityId}/prices:
+    post:
+      summary: Add prices for a specific security
+      parameters:
+        - in: path
+          name: securityId
+          required: true
+          schema:
+            type: integer
+          description: ID of the security
+      requestBody:
+        description: List of price objects to add
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/Price"
+      responses:
+        "201":
+          description: Prices added successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Price"
+        "400":
+          description: Bad request, invalid input
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Prices should be an array"
+        "404":
+          description: Security not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Security not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+  /securities/{id}:
+    get:
+      summary: Get a specific security by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID of the security
+      responses:
+        "200":
+          description: Security details retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  ticker:
+                    type: string
+                    example: "AAPL"
+                  securityName:
+                    type: string
+                    example: "Apple Inc."
+                  sector:
+                    type: string
+                    example: "Technology"
+                  country:
+                    type: string
+                    example: "USA"
+                  trend:
+                    type: number
+                    format: float
+                    example: 1.5
+                  prices:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Price"
+        "404":
+          description: Security not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Security not found"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Internal Server Error"
+
+components:
+  schemas:
+    Price:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: date
+          example: "2020-07-20"
+        close:
+          type: number
+          format: float
+          example: 41.24
+        volume:
+          type: integer
+          example: 84027200
+        securityId:
+          type: integer
+          example: 1
